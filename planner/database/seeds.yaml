@@ -1,0 +1,24 @@
+seeds:
+  continents:
+    updater: handle
+    columns:
+      - handle
+      - type
+      - name
+    files:
+      - territoria.csv
+
+  countries:
+    updater: handle
+    columns:
+      - handle
+      - continent
+      - name
+    files:
+      - africa.csv
+      - asia.csv
+      - australia.csv
+      - europe.csv
+      - north-america.csv
+      - south-america.csv
+      - united-states.csv

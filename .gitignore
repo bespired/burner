@@ -1,0 +1,3 @@
+docker/mysql/dbdata/
+.DS_Store
+docker/redis/dump.rdb

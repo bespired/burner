@@ -1,0 +1,70 @@
+networks:
+  docker.network:
+    driver: bridge
+
+services:
+
+  apache:
+    build:
+      context: ./docker/apache
+      dockerfile: ./apache.dockerfile
+
+    env_file: "./planner/docker.env"
+    restart: unless-stopped
+    container_name: travel.apache
+    tty: true
+    links:
+      - mysql
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - docker.network
+    volumes:
+      - ./planner:/var/www/html/
+
+  mysql:
+    image: mysql:latest
+    # platform: linux/amd64
+    # platform: linux/x86_64
+    platform: linux/arm64
+
+    restart: unless-stopped
+    container_name: travel.mysql
+    tty: true
+    ports:
+      - "3309:3306"
+    networks:
+      - docker.network
+    volumes:
+      - ./docker/mysql/dbdata:/var/lib/mysql
+      # - "./docker/mysql/mysqlconf:/etc/mysql/conf.d"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      # MYSQL_USER: ${MYSQL_USER:-localhost}
+
+  redis:
+    image: bitnami/redis:latest
+    env_file: "./planner/docker.env"
+
+    restart: unless-stopped
+    container_name: travel.redis
+    tty: true
+    ports:
+      - "6379:6379"
+    networks:
+      - docker.network
+    volumes:
+      - ./docker/redis:/bitnami/redis/data
+      - ./docker/redis:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+
+    command: >
+      /bin/sh -c "redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_ROOT_PASSWORD"
+      && sudo sysctl -w vm.overcommit_memory=1
+
+    environment:
+      ALLOW_EMPTY_PASSWORD: ${REDIS_ALLOW_EMPTY_PASSWORD:-no}
+

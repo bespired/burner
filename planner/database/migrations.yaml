@@ -1,0 +1,105 @@
+mysql:
+  types:
+    handle:       varchar(24) not null
+    name:         varchar(24)
+    text:         text
+    datetime-utc: datetime
+    boolean:      bool
+    rating:       tinyint
+    amount:       bigint
+    latlong:      json
+    enum:         enum
+    url:          text
+
+enums:
+  hashtype:
+    - password
+    - resetcode
+
+  timeframe:
+    - planning
+    - traveling
+    - done
+
+  owner:
+    - admin
+    - traveler
+
+  infotype:
+    - religion
+    - islands
+    - landmass
+    - weather
+
+
+tables:
+
+  owners:
+    columns:
+      handle:     handle
+      email:      text
+      active:     boolean
+      type:       enum(owner)
+      created-at: datetime-utc
+    index: handle
+
+  hashes:
+    columns:
+      handle: handle
+      owner:  handle
+      type:   enum(hashtype)
+      valid:  boolean
+      hash:   text
+      created-at: datetime-utc
+      last-used:  datetime-utc
+    trigger:
+      deleted: owner
+
+  holidays:
+    columns:
+      handle: handle
+      owner:  handle
+      name:   text
+      stage:  enum(timeframe)
+      start-date: datetime-utc
+      end-date:   datetime-utc
+    index:
+      - handle
+      - owner
+    trigger:
+      deleted: owner
+
+  continents:
+    columns:
+      handle:   handle
+      name:     text
+      type:     name
+      topleft:  latlong
+      botright: latlong
+
+  countries:
+    columns:
+      handle:    handle
+      continent: handle
+      name:      text
+      topleft:   latlong
+      botright:  latlong
+      flag:      url
+      people:    amount
+
+  country-pivot:
+    columns:
+      holiday: handle
+      country: handle
+      owner:   handle
+      stars:   rating
+    trigger:
+      deleted: owner
+
+  informations:
+    columns:
+      country: handle
+      handle:  handle
+      type:    enum(infotype)
+      info:    text
+
