@@ -34,6 +34,9 @@ joeri@MacBook burner % `docker compose up -d`
 	 ✔ Container travel.apache        Started  
   
 joeri@MacBook burner % `cd planner/database`  
+  
+Edit the `planner/docker.env` file to match your passwords.  
+  
 joeri@MacBook burner % `php install.php`
 
 	Database created successfully.
