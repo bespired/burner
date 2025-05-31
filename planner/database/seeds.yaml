@@ -6,7 +6,7 @@ seeds:
       - type
       - name
     files:
-      - territoria.csv
+      - territoria/territoria.csv
 
   countries:
     updater: handle
@@ -15,10 +15,15 @@ seeds:
       - continent
       - name
     files:
-      - africa.csv
-      - asia.csv
-      - australia.csv
-      - europe.csv
-      - north-america.csv
-      - south-america.csv
-      - united-states.csv
+      - territoria/africa.csv
+      - territoria/asia.csv
+      - territoria/australia.csv
+      - territoria/europe.csv
+      - territoria/north-america.csv
+      - territoria/south-america.csv
+      - territoria/united-states.csv
+
+  owners:
+    files:
+      - owners/admin.yml
+      - owners/joeri.yml

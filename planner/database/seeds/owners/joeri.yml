@@ -1,0 +1,21 @@
+seeds:
+  root:
+    owners:
+      updater: email
+      seed:
+        handle: (auto)
+        email:  joeri@bespired.nl
+        active: true
+        type:   traveler
+        created-at: (now)
+  children:
+    hashes:
+      updater: owner
+      seed:
+        handle: (auto)
+        owner:  parent(handle)
+        type:   password
+        valid:  true
+        hash:   hash(env(appUserPassword))
+        created-at: (now)
+        last-used:  null

@@ -54,6 +54,15 @@ trait DbConnection
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
+    public function mysqlCount($q)
+    {
+        $this->mysqlClear();
+        $result = $this->conn->query($q);
+        $values = $result->fetch_all(MYSQLI_ASSOC);
+        $value  = array_values($values[0]);
+        return intval($value[0]);
+    }
+
     public function mysqlQuery($q)
     {
         $this->mysqlClear();
@@ -108,7 +117,7 @@ trait DbConnection
     {
 
         if (is_null($val)) {
-            return null;
+            return 'NULL';
         }
 
         if (is_bool($val)) {
