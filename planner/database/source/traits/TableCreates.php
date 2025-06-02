@@ -1,6 +1,6 @@
 <?php
 
-trait TabelsCreate
+trait TableCreates
 {
 
     public function defineTables()

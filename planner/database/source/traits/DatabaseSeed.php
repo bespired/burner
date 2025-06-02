@@ -3,7 +3,7 @@
 trait DatabaseSeed
 {
 
-    private $roothandle = null;
+    private $handles = [];
 
     public function seedDatabase()
     {
@@ -63,6 +63,8 @@ trait DatabaseSeed
             $this->seedTableEntry($data, 'children', $tableName);
         }
 
+        // pivots?
+
     }
 
     // entry is root or any of the children
@@ -101,18 +103,24 @@ trait DatabaseSeed
 
         $data = $this->autoYmlData($data, $auto);
 
-        $entry      = $data->seeds[$area];
-        $entryTable = $entry[$tableName]['seed'];
+        $entry       = $data->seeds[$area];
+        $entryTable  = $entry[$tableName]['seed'];
+        $structTable = $entry[$tableName]['struct'];
+
+        // remove auto from $entryTable if it is an update
 
         $columns = array_keys($entryTable);
         $inserts = array_values($entryTable);
 
         if ($canUpdate) {
             // UPDATE
-            echo "Seed update $tableName \n";
-            $q = $this->updateSyntax($tableName, $updater, $columns, [$inserts]);
+            $key    = array_search('(auto)', $structTable);
+            $unsets = array_search($key, $columns);
+
+            // echo "Seed update $tableName \n";
+            $q = $this->updateSyntax($tableName, $updater, $columns, [$inserts], $unsets);
         } else {
-            echo "Seed insert $tableName \n";
+            // echo "Seed insert $tableName \n";
             $q = $this->insertSyntax($tableName, $columns, [$inserts]);
         }
 
@@ -180,7 +188,7 @@ trait DatabaseSeed
 
     }
 
-    private function updateSyntax($tableName, $updater, $columns, $data)
+    private function updateSyntax($tableName, $updater, $columns, $data, $unsets = null)
     {
         // START TRANSACTION;
         // UPDATE products SET price = 10 WHERE id = 1;
@@ -195,11 +203,15 @@ trait DatabaseSeed
         foreach ($data as $row) {
             $sets = [];
             foreach ($columns as $idx => $column) {
-                $mysqlColumn = str_replace('-', '_', $columns[$idx]);
-                $sets[$idx]  = "`$mysqlColumn` = " . $this->cast($row[$idx]);
+                $sqlColumn  = str_replace('-', '_', $columns[$idx]);
+                $sets[$idx] = "`$sqlColumn` = " . $this->cast($row[$idx]);
             }
             $where = $sets[$upx];
             unset($sets[$upx]);
+            if ($unsets !== null) {
+                unset($sets[$unsets]);
+            }
+
             $values = join(', ', $sets);
             $q .= "UPDATE `$tableName` SET $values WHERE $where; \n";
 
@@ -258,7 +270,6 @@ trait DatabaseSeed
     {
         $envre = '/env\(([\s\S]*?)\)/m';
         $hshre = '/hash\(([\s\S]*?)\)/m';
-        $parre = '/parent\(([\s\S]*?)\)/m';
 
         $auto   = $relate ? $relate[0] : null;
         $parent = $relate ? $relate[1] : null;
@@ -266,12 +277,14 @@ trait DatabaseSeed
         // echo "$tableName : $auto : $parent \n";
 
         foreach ($data as $columnName => $value) {
+            $combi = "$tableName--$columnName";
+
             switch (gettype($value)) {
                 case 'string':
                     switch ($value) {
                         case '(auto)':
-                            $data[$columnName] = $auto ?? $this->autoHandle($tableName);
-                            $this->roothandle  = $data[$columnName];
+                            $data[$columnName]     = $auto ?? $this->autoHandle($tableName);
+                            $this->handles[$combi] = $data[$columnName];
 
                             break;
                         case '(now)':
@@ -304,14 +317,9 @@ trait DatabaseSeed
                         }
                     }
 
-                    if ($value && substr_count($value, 'parent(')) {
-                        preg_match_all($parre, $value, $matches, PREG_SET_ORDER, 0);
-                        if (count($matches) > 0) {
-                            $column = $matches[0][1];
-                            $reps   = $matches[0][0];
-
-                            $data[$columnName] = $parent ?? $this->roothandle;
-                        }
+                    if ($value && substr_count($value, '--')) {
+                        $data[$columnName] = $this->handles[$value];
+                        // echo "$combi is filled with " . $data[$columnName] . "\n";
                     }
 
                     break;

@@ -13,7 +13,7 @@ seeds:
       updater: owner
       seed:
         handle: (auto)
-        owner:  parent(handle)
+        owner:  owners--handle
         type:   password
         valid:  true
         hash:   hash(env(appAdminPassword))

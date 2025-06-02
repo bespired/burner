@@ -40,15 +40,6 @@ trait DbConnection
         $this->conn->query('use ' . $database);
     }
 
-    public function mysqlClear()
-    {
-        do {
-            if ($res = $this->conn->store_result()) {
-                $this->conn->free();
-            }
-        } while ($this->conn->more_results() && $this->conn->next_result());
-    }
-
     public function mysqlResult($result)
     {
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -63,11 +54,22 @@ trait DbConnection
         return intval($value[0]);
     }
 
+    public function mysqlClear()
+    {
+        do {
+            if ($res = $this->conn->store_result()) {
+                $this->conn->free();
+            }
+        } while ($this->conn->more_results() && $this->conn->next_result());
+    }
+
     public function mysqlQuery($q)
     {
         $this->mysqlClear();
 
-        if (stripos($q, 'commit')) {
+        $commit = strripos($q, 'commit') > 0;
+
+        if ($commit) {
             $result = $this->conn->multi_query($q);
         } else {
             $result = $this->conn->query($q);

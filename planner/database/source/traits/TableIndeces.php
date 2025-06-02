@@ -1,6 +1,6 @@
 <?php
 
-trait TabelsIndex
+trait TableIndeces
 {
 
     public function indexTables()

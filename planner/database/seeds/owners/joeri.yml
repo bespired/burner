@@ -13,9 +13,25 @@ seeds:
       updater: owner
       seed:
         handle: (auto)
-        owner:  parent(handle)
+        owner:  owners--handle
         type:   password
         valid:  true
         hash:   hash(env(appUserPassword))
         created-at: (now)
         last-used:  null
+    holidays:
+      updater: owner
+      seed:
+        handle: (auto)
+        owner:  owners--handle
+        name:   My Holiday
+        start-date: 2025-11-28 00:00:00
+        end-date: 2025-12-12 23:59:59
+        stage: research
+  # pivots:
+    country-pivot:
+      seed:
+        holiday: holidays--handle
+        country: asnja
+        owner:   owners--handle
+        stars:   null

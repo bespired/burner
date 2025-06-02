@@ -16,10 +16,7 @@ $migrate->createTables();
 $migrate->alterTables();
 
 $migrate->indexTables();
-
-// todo:
-// $migrate->foreignTables();
-// $migrate->swapColumns();
+$migrate->createTriggers();
 
 $seed = new Seed($env);
 $seed->readSeedFile();

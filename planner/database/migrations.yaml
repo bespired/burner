@@ -17,8 +17,9 @@ enums:
     - resetcode
 
   timeframe:
-    - planning
-    - traveling
+    - research
+    - plan
+    - travel
     - done
 
   owner:
@@ -53,7 +54,7 @@ tables:
       created-at: datetime-utc
       last-used:  datetime-utc
     trigger:
-      deleted: owner
+      deleted: owners--owner
 
   holidays:
     columns:
@@ -67,7 +68,7 @@ tables:
       - handle
       - owner
     trigger:
-      deleted: owner
+      deleted: owners--owner
 
   continents:
     columns:
@@ -94,7 +95,7 @@ tables:
       owner:   handle
       stars:   rating
     trigger:
-      deleted: owner
+      deleted: owners--owner
 
   informations:
     columns:
