@@ -36,6 +36,14 @@ joeri@MacBook burner % `docker compose up -d`
 joeri@MacBook burner % `cd planner/database`  
   
 Edit the `planner/docker.env` file to match your passwords.  
+
+	# APP
+	APP_ADMIN=admin@domain.com
+	APP_ADMIN_PASSWORD=notrealpassword
+
+	APP_USER=joeri@domain.com
+	APP_USER_PASSWORD=notrealpassword
+  
   
 joeri@MacBook burner % `php install.php`
 
@@ -49,8 +57,9 @@ joeri@MacBook burner % `php install.php`
 	informations created.
 	Create index for handle on holidays.
 	Create index for owner on holidays.
-	Seeded continents table
-	Seeded countries table
+	Seeded continents table.
+	Seeded countries table.
+	Seeded owners table.
     
  
  ![](https://raw.githubusercontent.com/bespired/burner/refs/heads/main/docker/sequel-ace.png)
