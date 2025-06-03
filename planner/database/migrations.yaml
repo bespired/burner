@@ -165,7 +165,9 @@ tables:
       end-spot:    handle
       is-stopover: boolean
       connection:  handle
-    index: handle
+    index:
+        - start-spot
+        - end-spot
     trigger:
       deleted: owners--owner
 
@@ -179,7 +181,7 @@ tables:
       country:  handle
     unique: handle
     trigger:
-      deleted: travels--start-spot
+      deleted: travels--handle
 
   lists:
     columns:

@@ -50,7 +50,7 @@ trait TableIndeces
                 continue;
             }
 
-            if ((!in_array($column, $ymindeces)) && (!in_array($column, $ymuniques ?? []))) {
+            if ((! in_array($column, $ymindeces)) && (! in_array($column, $ymuniques ?? []))) {
                 $drops[] = $dbindex['Key_name'];
             }
         }
@@ -81,16 +81,17 @@ trait TableIndeces
 
         $adds = [];
         foreach ($ymindeces as $index) {
-            if (!in_array($index, $names)) {
+            if (! in_array($index, $names)) {
                 $adds[$index] = $index;
             }
         }
 
         if (count($adds)) {
             foreach ($adds as $add) {
-                $q = '';
-                $q .= "CREATE INDEX `{$add}_index` ";
-                $q .= "ON $tableName($add) USING BTREE; ";
+                $column = str_replace('-', '_', $add);
+                $q      = '';
+                $q .= "CREATE INDEX `{$column}_index` ";
+                $q .= "ON $tableName($column) USING BTREE; ";
 
                 $result = $this->conn->query($q);
                 echo $result ? "Create index for $add on $tableName.\n" : "Failed index for $add.\n";
@@ -110,7 +111,7 @@ trait TableIndeces
 
         $adds = [];
         foreach ($ymuniques as $index) {
-            if (!in_array($index, $names)) {
+            if (! in_array($index, $names)) {
                 $adds[$index] = $index;
             }
         }
