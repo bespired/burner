@@ -20,11 +20,20 @@ trait TableTriggers
         }
 
         if (! count($deletes)) {
+            // todo...
+            // if DB has delete triggers... remove them...
             return;
         }
 
         $tiggers = [];
         foreach ($deletes as $table => $delete) {
+            // if (gettype($delete) == 'string') {
+            //     $delete = [$delete];
+            // }
+            // foreach ($delete as $deleter) {
+            //     list($foreign, $column)    = explode('--', $deleter);
+            //     $tiggers[$foreign][$table] = $column;
+            // }
             list($foreign, $column)    = explode('--', $delete);
             $tiggers[$foreign][$table] = $column;
         }
@@ -79,7 +88,8 @@ trait TableTriggers
         $q[] = "FOR EACH ROW";
         $q[] = "BEGIN";
         foreach ($tableIds as $table => $id) {
-            $q[] = "DELETE FROM `$table` WHERE `$id` = `OLD`.`$main`;";
+            $column = str_replace('-', '_', $id);
+            $q[]    = "DELETE FROM `$table` WHERE `$column` = `OLD`.`$main`;";
         }
         $q[] = "END";
 

@@ -2,6 +2,7 @@ mysql:
   types:
     handle:       varchar(24) not null
     name:         varchar(24)
+    label:        varchar(255)
     text:         text not null
     datetime-utc: datetime
     boolean:      bool
@@ -12,25 +13,59 @@ mysql:
     url:          text
 
 enums:
-  hashtype:
-    - password
-    - resetcode
+  owner:
+    - admin
+    - traveler
 
-  timeframe:
+  stage:
     - research
     - plan
     - travel
     - done
 
-  owner:
-    - admin
-    - traveler
+  traveltype:
+    - flight
+    - train
+    - bus
+    - taxi
+    - car
+    - caravan
+    - rentalcar
+    - campervan
+    - walk
+    - hike
+    - bicycle
+    - scooter
+    - boat
+    - ferry
+    - cruise
+
+  hashtype:
+    - password
+    - resetcode
 
   infotype:
     - religion
     - islands
     - landmass
     - weather
+
+  listtype:
+    - todo
+    - attractions
+    - experiences
+    - check
+    - packing
+    - eat
+    - sleep
+
+  status:
+    - research
+    - plan
+    - booked
+    - canceled
+    - done
+
 
 
 tables:
@@ -65,7 +100,7 @@ tables:
       handle: handle
       owner:  handle
       name:   text
-      stage:  enum(timeframe)
+      stage:  enum(stage)
       start-date: datetime-utc
       end-date:   datetime-utc
     index:
@@ -83,6 +118,13 @@ tables:
       topleft:  latlong
       botright: latlong
     unique: handle
+
+  labels:
+    columns:
+      handle: handle
+      name:   text
+      type:   name
+    unique:   handle
 
   countries:
     columns:
@@ -110,6 +152,42 @@ tables:
       handle:  handle
       type:    enum(infotype)
       info:    text
+    unique: handle
+
+  travels: # flight details
+    columns:
+      handle:      handle
+      owner:       handle
+      type:        enum(traveltype)
+      start-time:  datetime-utc
+      start-spot:  handle
+      end-time:    datetime-utc
+      end-spot:    handle
+      is-stopover: boolean
+      connection:  handle
+    index: handle
+    trigger:
+      deleted: owners--owner
+
+  spots: # location on earth
+    columns:
+      handle:   handle
+      location: latlong
+      name:     label
+      adres:    label
+      city:     label
+      country:  handle
+    unique: handle
+    trigger:
+      deleted: travels--start-spot
+
+  lists:
+    columns:
+      handle:   handle
+      type:     enum(listtype)
+      status:   enum(status)
+      category: handle
+      name:     text
     unique: handle
 
 
