@@ -2,11 +2,10 @@
 
 trait MigrateFileRead
 {
-
     public function readMigrateFile()
     {
         $filename = 'migrations.yaml';
-        if (! file_exists($filename)) {
+        if (!file_exists($filename)) {
             exit("Migrate failed: cannot find $filename \n");
         }
 
@@ -17,32 +16,32 @@ trait MigrateFileRead
             exit("Parsing of $filename failed.\n");
         }
 
-        if (! property_exists($parsed, 'tables')) {
+        if (!property_exists($parsed, 'tables')) {
             exit("$filename failed, it should have tables.\n");
         }
 
-        if (! property_exists($parsed, 'mysql')) {
+        if (!property_exists($parsed, 'mysql')) {
             exit("$filename failed, it should have type mapping.\n");
         }
 
-        if (! $parsed->mysql['types']) {
+        if (!$parsed->mysql['types']) {
             exit("$filename failed, it should have type mapping.\n");
         }
 
         $missingEnums = [];
         $missingTypes = [];
         foreach ($parsed->tables as $table) {
-            $columns = $table['columns'];
+            $columns = @$table['columns'];
             foreach ($columns ?? [] as $column) {
                 $type = explode('(', $column)[0];
                 if ($type === 'enum') {
                     $enum = rtrim(explode('(', $column)[1], ')');
-                    if (! isset($parsed->enums[$enum])) {
+                    if (!isset($parsed->enums[$enum])) {
                         $missingEnums[$enum] = $enum;
                     }
                 }
 
-                if (! isset($parsed->mysql['types'][$type])) {
+                if (!isset($parsed->mysql['types'][$type])) {
                     $missingTypes[$type] = $type;
                 }
             }
@@ -66,7 +65,5 @@ trait MigrateFileRead
         }
 
         $this->yaml = $parsed;
-
     }
-
 }

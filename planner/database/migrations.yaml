@@ -2,7 +2,7 @@ mysql:
   types:
     handle:       varchar(24) not null
     name:         varchar(24)
-    text:         text
+    text:         text not null
     datetime-utc: datetime
     boolean:      bool
     rating:       tinyint
@@ -43,6 +43,9 @@ tables:
       type:       enum(owner)
       created-at: datetime-utc
     index: handle
+    unique:
+      - handle
+      - email
 
   hashes:
     columns:
@@ -53,6 +56,7 @@ tables:
       hash:   text
       created-at: datetime-utc
       last-used:  datetime-utc
+    unique: handle
     trigger:
       deleted: owners--owner
 
@@ -67,6 +71,7 @@ tables:
     index:
       - handle
       - owner
+    unique: handle
     trigger:
       deleted: owners--owner
 
@@ -77,6 +82,7 @@ tables:
       type:     name
       topleft:  latlong
       botright: latlong
+    unique: handle
 
   countries:
     columns:
@@ -87,6 +93,7 @@ tables:
       botright:  latlong
       flag:      url
       people:    amount
+    unique: handle
 
   country-pivot:
     columns:
@@ -103,4 +110,6 @@ tables:
       handle:  handle
       type:    enum(infotype)
       info:    text
+    unique: handle
+
 
