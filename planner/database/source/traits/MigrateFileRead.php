@@ -19,20 +19,19 @@ trait MigrateFileRead
         if (!property_exists($mfiles, 'migrations')) {
             exit("$filename failed, it should have migrations.\n");
         }
-        if (!isset($mfiles->migrations['files'])) {
-            exit("$filename failed, it should have migration files.\n");
+
+        if (!isset($mfiles->migrations['config'])) {
+            exit("$filename failed, it should have config files.\n");
         }
 
-        $combined = '';
-        foreach ($mfiles->migrations['files'] as $filename) {
-            $path = __DIR__ . '/../../migrations/' . $filename;
-            if (!file_exists($path)) {
-                exit("Migrate failed: cannot find $path  \n");
-            }
-            $combined .= file_get_contents($path) . "\n";
+        if (!isset($mfiles->migrations['tables'])) {
+            exit("$filename failed, it should have table files.\n");
         }
 
-        $parsed = (object) @yaml_parse($combined);
+        $config = $this->readConfigFiles($mfiles->migrations['config']);
+        $tables = $this->readTableFiles($mfiles->migrations['tables']);
+
+        $parsed = (object) @yaml_parse($config . $tables);
 
         if (!property_exists($parsed, 'tables')) {
             exit("$filename failed, it should have tables.\n");
@@ -83,5 +82,35 @@ trait MigrateFileRead
         }
 
         $this->yaml = $parsed;
+    }
+
+    private function readConfigFiles($files)
+    {
+        $combined = '';
+        foreach ($files as $filename) {
+            $path = __DIR__ . '/../../migrations/' . $filename;
+            if (!file_exists($path)) {
+                exit("Migrate failed: cannot find $path  \n");
+            }
+            $combined .= file_get_contents($path) . "\n";
+        }
+
+        return $combined;
+    }
+
+    private function readTableFiles($files)
+    {
+        $combined = 'tables:';
+        foreach ($files as $filename) {
+            $path = __DIR__ . '/../../migrations/' . $filename;
+            if (!file_exists($path)) {
+                exit("Migrate failed: cannot find $path  \n");
+            }
+            $table = @file_get_contents($path);
+            $table = str_replace("\n", "\n    ", "\n" . $table) . "\n";
+            $combined .= $table;
+        }
+
+        return $combined;
     }
 }

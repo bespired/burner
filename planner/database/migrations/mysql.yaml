@@ -1,4 +1,5 @@
 mysql:
+
   types:
     handle:       varchar(24) not null
     name:         varchar(24)

@@ -1,5 +1,7 @@
 migrations:
-  files:
+  config:
     - mysql.yaml
     - enums.yaml
-    - tables.yaml
+  tables:
+    - owner.yaml
+    - holiday.yaml

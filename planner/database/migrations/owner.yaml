@@ -1,0 +1,24 @@
+owners:
+  columns:
+    handle:     handle
+    email:      text
+    active:     boolean
+    type:       enum(owner)
+    created-at: datetime-utc
+  index: handle
+  unique:
+    - handle
+    - email
+
+hashes:
+  columns:
+    handle: handle
+    owner:  handle
+    type:   enum(hashtype)
+    valid:  boolean
+    hash:   text
+    created-at: datetime-utc
+    last-used:  datetime-utc
+  unique: handle
+  trigger:
+    deleted: owners--owner

@@ -1,4 +1,5 @@
 enums:
+
   hashtype:
     - password
     - resetcode
