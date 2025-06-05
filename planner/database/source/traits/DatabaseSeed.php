@@ -35,7 +35,7 @@ trait DatabaseSeed
     private function seedYml($tableName, $tables, $filename)
     {
         $filepath = realpath(__DIR__ . "/../../seeds/$filename");
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             echo "Cannot find $filename in seeds folder.\n";
 
             return;
@@ -89,7 +89,7 @@ trait DatabaseSeed
 
     private function canUpdate($entry, $tableName, $idx)
     {
-        if (!isset($entry[$tableName]['updater'])) {
+        if (! isset($entry[$tableName]['updater'])) {
             return false;
         }
 
@@ -100,19 +100,23 @@ trait DatabaseSeed
 
         $identifier = array_search('(auto)', $structTable);
 
-        if (!$identifier) {
+        if (! $identifier) {
             return false;
         }
 
         $auto  = false;
         $combi = "$tableName--$identifier--$idx";
 
-        $entryTables  = $entry[$tableName]['seed'];
-        $entryTable   = $this->isIndexedArray($entryTables) ? $entryTables[$idx] : $entryTables;
+        $entryTables = $entry[$tableName]['seed'];
+        $entryTable  = $this->isIndexedArray($entryTables) ? $entryTables[$idx] : $entryTables;
+
+        $entryTable = $this->valueSwappers($tableName, $entryTable, $idx);
 
         $q = '';
         $q .= "SELECT `$identifier` FROM `$tableName` ";
         $q .= "WHERE `$updater` = " . $this->cast($entryTable[$updater]);
+
+        // echo $q . "\n";
 
         $r = $this->mysqlQuery($q);
 
@@ -138,7 +142,7 @@ trait DatabaseSeed
         }
 
         $filepath = realpath(__DIR__ . "/../../seeds/$filename");
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             echo "Cannot find $filename in seeds folder.\n";
 
             return;
@@ -149,20 +153,20 @@ trait DatabaseSeed
         if ($canUpdate) {
             // insert or update by handle.
 
-            $handles = array_map(fn ($row) => $row[$idx], $data);
+            $handles = array_map(fn($row) => $row[$idx], $data);
 
             // SELECT * FROM `` WHERE `` IN ()
             $query  = $this->createListQuery($tableName, $updater, $handles);
             $founds = $this->mysqlQuery($query);
 
-            $found = array_map(fn ($row) => $row[$updater], $founds);
+            $found = array_map(fn($row) => $row[$updater], $founds);
 
             $hdlinserts = array_diff($handles, $found);
             $hdlupdates = array_diff($handles, $hdlinserts);
 
             if (count($hdlinserts)) {
                 $inserts = array_filter($data,
-                    fn ($row) => in_array($row[$idx], $hdlinserts));
+                    fn($row) => in_array($row[$idx], $hdlinserts));
 
                 $q = $this->insertSyntax($tableName, $columns, $inserts);
                 $r = $this->mysqlQuery($q);
@@ -170,7 +174,7 @@ trait DatabaseSeed
 
             if (count($hdlupdates)) {
                 $updates = array_filter($data,
-                    fn ($row) => in_array($row[$idx], $hdlupdates));
+                    fn($row) => in_array($row[$idx], $hdlupdates));
 
                 $q = $this->updateSyntax($tableName, $updater, $columns, $updates);
                 $r = $this->mysqlQuery($q);
@@ -232,7 +236,7 @@ trait DatabaseSeed
             $casts[] = '(' . join(', ', $cols) . ')';
         }
 
-        $columns = array_map(fn ($c) => str_replace('-', '_', $c), $columns);
+        $columns = array_map(fn($c) => str_replace('-', '_', $c), $columns);
 
         $q = '';
         $q .= "INSERT INTO `$tableName` ";
@@ -254,12 +258,12 @@ trait DatabaseSeed
                 case 'string':
                     switch ($value) {
                         case '(auto)':
-                            if (!isset($this->autohandles[$combi])) {
+                            if (! isset($this->autohandles[$combi])) {
                                 $handle                    = $this->autoHandle($tableName);
                                 $data[$columnName]         = $handle;
                                 $this->autohandles[$combi] = $handle;
                             } else {
-                                $data[$columnName] =  $this->autohandles[$combi];
+                                $data[$columnName] = $this->autohandles[$combi];
                             }
 
                             break;
@@ -294,8 +298,14 @@ trait DatabaseSeed
                     }
 
                     if ($value && substr_count($value, '--')) {
-                        $handle            =  $value . '--0';
-                        $data[$columnName] = $this->autohandles[$handle];
+
+                        $handle  = $value;
+                        $handle0 = $value . '--0';
+                        if (array_key_exists($handle0, $this->autohandles)) {
+                            $handle = $handle0;
+                        }
+
+                        $data[$columnName] = @$this->autohandles[$handle];
                         // echo "$combi is filled with " . $data[$columnName] . "\n";
                     }
 
@@ -325,7 +335,7 @@ trait DatabaseSeed
         $file  = file_get_contents($filepath);
         $lines = explode("\n", $file);
 
-        $rows = array_filter($lines, fn ($row) => ('' !== trim($row)));
+        $rows = array_filter($lines, fn($row) => ('' !== trim($row)));
 
         foreach ($rows as $row) {
             $data[] = str_getcsv($row, ',', "'", '\\');
@@ -340,7 +350,7 @@ trait DatabaseSeed
         $tableName  = array_keys($entry)[0];
         $entryTable = $entry[$tableName]['seed'];
 
-        if (!$this->isIndexedArray($entryTable)) {
+        if (! $this->isIndexedArray($entryTable)) {
             $entryTable = [$entryTable];
         }
 
@@ -349,7 +359,7 @@ trait DatabaseSeed
 
         foreach ($data->seeds['children'] as $tableName => $entry) {
             $entryTable = $entry['seed'];
-            if (!$this->isIndexedArray($entryTable)) {
+            if (! $this->isIndexedArray($entryTable)) {
                 $entryTable = [$entryTable];
             }
             $data->seeds['children'][$tableName]['seed']   = $entryTable;
@@ -372,7 +382,7 @@ trait DatabaseSeed
             exit("Parsing of seedfile $path[0]failed . \n ");
         }
 
-        if (!property_exists($parsed, 'seeds')) {
+        if (! property_exists($parsed, 'seeds')) {
             exit("$path[0]failed, it shouldhaveseeds . \n ");
         }
 

@@ -42,11 +42,11 @@ locations:
     parent:     handle
     belongs-to: enum(polymorph)
     latlon:     latlong
-    name:       text
-    address:    text
-    city:       text
+    name:       string
+    address:    string
+    city:       string
     country:    handle
-    phone:      text
+    phone:      string
     website:    url
   index: handle
 

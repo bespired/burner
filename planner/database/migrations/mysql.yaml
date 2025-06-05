@@ -4,6 +4,7 @@ mysql:
     handle:       varchar(24) not null
     name:         varchar(24)
     text:         text not null
+    string:       tinytext
     datetime-utc: datetime
     boolean:      bool
     rating:       tinyint

@@ -80,5 +80,41 @@ seeds:
         checkout:   2025-11-29 11:00:00
         type:       hotel
 
-
-
+    locations:
+      updater: parent
+      seed:
+      -
+        handle:     (auto)
+        parent:     travels--handle--0
+        belongs-to: travels
+        latlon:     null
+        city:       Abu Dhabi
+        country:    aswun
+      -
+        handle:     (auto)
+        parent:     travels--handle--1
+        belongs-to: travels
+        latlon:     null
+        city:       Osaka
+        country:    asnja
+      -
+        handle:     (auto)
+        parent:     overnights--handle--0
+        belongs-to: overnights
+        latlon:     null
+        city:       Kyoto
+        country:    asnja
+      -
+        handle:     (auto)
+        parent:     overnights--handle--1
+        belongs-to: overnights
+        latlon:     null
+        city:       Nagoya
+        country:    asnja
+      -
+        handle:     (auto)
+        parent:     overnights--handle--2
+        belongs-to: overnights
+        latlon:     null
+        city:       Tokyo
+        country:    asnja
