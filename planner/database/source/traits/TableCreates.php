@@ -2,7 +2,6 @@
 
 trait TableCreates
 {
-
     public function defineTables()
     {
         $database = $this->env->mysqlDatabase;
@@ -22,7 +21,6 @@ trait TableCreates
 
     public function createTables()
     {
-
         $database = $this->env->mysqlDatabase;
 
         $conn = $this->openConnection();
@@ -31,12 +29,10 @@ trait TableCreates
         $types = $this->yaml->mysql['types'];
 
         foreach ($this->yaml->tables as $tableName => $table) {
-
             if ('create' === $table['status']) {
                 // yes create this one
                 $columns = [];
                 foreach ($table['columns'] as $columnName => $column) {
-
                     $name  = str_replace('-', '_', $columnName);
                     $type  = explode('(', $column)[0];
                     $enums = '';
@@ -54,13 +50,10 @@ trait TableCreates
                 $result = $conn->query($query);
 
                 echo $result ? "$tableName created.\n" : "Error on $tableName.\n";
-
             }
-
         }
 
         $this->closeConnection();
-
     }
 
     public function alterTables()
@@ -73,7 +66,6 @@ trait TableCreates
         $types = $this->yaml->mysql['types'];
 
         foreach ($this->yaml->tables as $tableName => $table) {
-
             if ('alter' === $table['status']) {
                 // alter this one table
 
@@ -85,13 +77,10 @@ trait TableCreates
                 $this->alterAdds($tableName, $table, $array);
                 $this->alterEnums($tableName, $table, $array);
                 $this->alterSizes($tableName, $table, $array);
-
             }
-
         }
 
         $this->closeConnection();
-
     }
 
     private function alterDrops($tableName, $table, $array)
@@ -103,14 +92,14 @@ trait TableCreates
         $drops = [];
         foreach ($array as $column) {
             $field = str_replace('_', '-', $column['Field']);
-            if (! isset($table['columns'][$field])) {
+            if (!isset($table['columns'][$field])) {
                 if ($field !== 'id') {
                     $drops[$field] = $column['Field'];
                 }
             }
         }
         if (count($drops)) {
-            $mapped = array_map(fn($a) => "DROP COLUMN `$a`", $drops);
+            $mapped = array_map(fn ($a) => "DROP COLUMN `$a`", $drops);
             $q      = '';
             $q .= "ALTER TABLE `$tableName` \n";
             $q .= join(",\n", $mapped) . ";\n";
@@ -120,7 +109,6 @@ trait TableCreates
             $plural = count($drops) == 1 ? 'column' : 'columns';
             echo $result ? "Dropped $plural `$names` in `$tableName`.\n" : "Drop failed.\n";
         }
-
     }
 
     private function alterAdds($tableName, $table, $array)
@@ -142,7 +130,7 @@ trait TableCreates
         foreach ($table['columns'] as $columnName => $column) {
             $name = str_replace('-', '_', $columnName);
 
-            if (! in_array($name, $dbfields)) {
+            if (!in_array($name, $dbfields)) {
                 $type  = explode('(', $column)[0];
                 $enums = '';
 
@@ -169,7 +157,6 @@ trait TableCreates
                 echo $result ? "Added column `$add` in `$tableName`.\n" : "Add failed.\n";
             }
         }
-
     }
 
     private function alterEnums($tableName, $table, $array)
@@ -181,7 +168,6 @@ trait TableCreates
         foreach ($array as $column) {
             $type = $column['Type'];
             if (str_starts_with($type, 'enum')) {
-
                 // this is an enum, is it changed?
                 $dbfield = str_replace('_', '-', $column['Field']);
                 $ymfield = $table['columns'][$dbfield];
@@ -206,9 +192,7 @@ trait TableCreates
             }
             echo "Altering enums can give strange results if the enums are already handed out.\n";
             echo "Some code could be in place here to remap existing enums to new enumurating.\n";
-
         }
-
     }
 
     private function alterSizes($tableName, $table, $array)
@@ -221,7 +205,6 @@ trait TableCreates
         // check what we got agains what we want.
         $change = [];
         foreach ($array as $column) {
-
             $field = str_replace('_', '-', $column['Field']);
             if ($field === 'id') {
                 continue;
@@ -232,20 +215,20 @@ trait TableCreates
                 continue;
             }
 
-            $ymtype = $table['columns'][$field];
-            $wanted = $types[$ymtype];
+            if (isset($table['columns'][$field])) {
+                $ymtype = $table['columns'][$field];
+                $wanted = $types[$ymtype];
 
-            $notnull = ($column['Null'] == 'NO') ? ' not null' : '';
+                $notnull = ($column['Null'] == 'NO') ? ' not null' : '';
 
-            if ($type == 'tinyint(1)') {
-                $type = 'bool';
+                if ($type == 'tinyint(1)') {
+                    $type = 'bool';
+                }
+
+                if ($type . $notnull !== $wanted) {
+                    $change[$column['Field']] = $wanted;
+                }
             }
-
-            if ($type . $notnull !== $wanted) {
-
-                $change[$column['Field']] = $wanted;
-            }
-
         }
         if (count($change)) {
             foreach ($change as $column => $change) {
@@ -256,9 +239,6 @@ trait TableCreates
                 $result = $this->conn->query($q);
                 echo $result ? "Column `$column` changed to $change in `$tableName`.\n" : "Change failed.\n";
             }
-
         }
-
     }
-
 }

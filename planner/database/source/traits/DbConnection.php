@@ -2,7 +2,6 @@
 
 trait DbConnection
 {
-
     public function openConnection()
     {
         $servername = $this->env->mysqlHost;
@@ -51,6 +50,7 @@ trait DbConnection
         $result = $this->conn->query($q);
         $values = $result->fetch_all(MYSQLI_ASSOC);
         $value  = array_values($values[0]);
+
         return intval($value[0]);
     }
 
@@ -69,16 +69,20 @@ trait DbConnection
 
         $commit = strripos($q, 'commit') > 0;
 
-        if ($commit) {
-            $result = $this->conn->multi_query($q);
-        } else {
-            $result = $this->conn->query($q);
+        try {
+            if ($commit) {
+                $result = $this->conn->multi_query($q);
+            } else {
+                $result = $this->conn->query($q);
+            }
+        } catch (Exception $e) {
+            echo $q;
         }
 
-        if (gettype($result) == "boolean") {
+        if (gettype($result) == 'boolean') {
             return $result;
         }
-        if (gettype($result) == "object") {
+        if (gettype($result) == 'object') {
             return $result->fetch_all(MYSQLI_ASSOC);
         }
 
@@ -88,7 +92,7 @@ trait DbConnection
     public function createTableQuery($tableName, $columns)
     {
         $fullcolumns   = [];
-        $fullcolumns[] = "`id` BIGINT PRIMARY KEY AUTO_INCREMENT";
+        $fullcolumns[] = '`id` BIGINT PRIMARY KEY AUTO_INCREMENT';
         foreach ($columns as $name => $type) {
             $fullcolumns[] = "`$name` " . strtoupper($type);
         }
@@ -110,14 +114,13 @@ trait DbConnection
         $q = '';
         $q .= "SELECT * FROM `$tableName` ";
         $q .= "WHERE `$column` \n";
-        $q .= "IN (" . join(",", $casts) . ");";
+        $q .= 'IN (' . join(',', $casts) . ');';
 
         return $q;
     }
 
     public function cast($val)
     {
-
         if (is_null($val)) {
             return 'NULL';
         }
@@ -144,5 +147,4 @@ trait DbConnection
     //     Address varchar(255),
     //     City varchar(255)
     // );
-
 }

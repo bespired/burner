@@ -19,19 +19,66 @@ seeds:
         hash:   hash(env(appUserPassword))
         created-at: (now)
         last-used:  null
+
     holidays:
-      updater: owner
+      updater: name
       seed:
         handle: (auto)
         owner:  owners--handle
         name:   My Holiday
         start-date: 2025-11-28 00:00:00
-        end-date: 2025-12-12 23:59:59
-        stage: research
-  # pivots:
+        end-date:   2025-12-12 23:59:59
+        stage:  research
+
     country-pivot:
       seed:
         holiday: holidays--handle
         country: asnja
         owner:   owners--handle
         stars:   null
+
+    travels:
+      updater: name
+      seed:
+      -
+        handle:     (auto)
+        holiday:    holidays--handle
+        name:       flight overstop
+        leave:      2025-11-28 08:00:00
+        arrive:     2025-11-28 10:10:00
+        type:       flight
+      -
+        handle:     (auto)
+        holiday:    holidays--handle
+        name:       flight to destination
+        leave:      2025-11-28 12:00:00
+        arrive:     2025-11-28 23:09:00
+        type:       flight
+
+    overnights:
+      updater: name
+      seed:
+      -
+        handle:     (auto)
+        holiday:    holidays--handle
+        name:       Hotel Bombaby
+        checkin:    2025-11-28 16:00:00
+        checkout:   2025-11-29 11:00:00
+        type:       hotel
+      -
+        handle:     (auto)
+        holiday:    holidays--handle
+        name:       Hotel Rabbit
+        checkin:    2025-11-28 16:00:00
+        checkout:   2025-11-29 11:00:00
+        type:       hotel
+      -
+        handle:     (auto)
+        holiday:    holidays--handle
+        name:       Hotel Dundy
+        checkin:    2025-11-28 16:00:00
+        checkout:   2025-11-29 11:00:00
+        type:       hotel
+
+
+

@@ -14,6 +14,7 @@ overnights:
   columns:
     handle:     handle
     holiday:    handle
+    name:       text
     checkin:    datetime-utc
     checkout:   datetime-utc
     type:       enum(overnight)
@@ -25,8 +26,10 @@ overnights:
 travels:
   columns:
     handle:     handle
-    checkin:    datetime-utc
-    checkout:   datetime-utc
+    holiday:    handle
+    name:       text
+    leave:      datetime-utc
+    arrive:     datetime-utc
     type:       enum(travel)
   index: handle
   trigger:

@@ -26,6 +26,7 @@ enums:
     - travels
 
   travel:
+    - tbd
     - walk
     - hike
     - drive
@@ -37,6 +38,7 @@ enums:
     - cruise
 
   overnight:
+    - tbd
     - home
     - dorm
     - hotel
