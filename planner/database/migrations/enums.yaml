@@ -19,3 +19,25 @@ enums:
     - islands
     - landmass
     - weather
+
+  polymorph:
+    - owners
+    - overnights
+    - travels
+
+  travel:
+    - walk
+    - hike
+    - drive
+    - car
+    - rental
+    - camper
+    - flight
+    - boat
+    - cruise
+
+  overnight:
+    - home
+    - dorm
+    - hotel
+    - tempel

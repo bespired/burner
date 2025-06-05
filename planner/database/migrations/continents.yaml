@@ -1,0 +1,37 @@
+continents:
+  columns:
+    handle:   handle
+    name:     text
+    type:     name
+    topleft:  latlong
+    botright: latlong
+  unique: handle
+
+countries:
+  columns:
+    handle:    handle
+    continent: handle
+    name:      text
+    topleft:   latlong
+    botright:  latlong
+    flag:      url
+    people:    amount
+  unique: handle
+
+country-pivot:
+  columns:
+    holiday: handle
+    country: handle
+    owner:   handle
+    stars:   rating
+  trigger:
+    deleted: owners--owner
+
+informations:
+  columns:
+    country: handle
+    handle:  handle
+    type:    enum(infotype)
+    info:    text
+  unique: handle
+

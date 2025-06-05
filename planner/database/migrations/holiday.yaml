@@ -6,48 +6,44 @@ holidays:
     stage:  enum(timeframe)
     start-date: datetime-utc
     end-date:   datetime-utc
-  index:
-    - handle
-    - owner
-  unique: handle
+  index: handle
   trigger:
     deleted: owners--owner
 
-continents:
+overnights:
   columns:
-    handle:   handle
-    name:     text
-    type:     name
-    topleft:  latlong
-    botright: latlong
-  unique: handle
-
-countries:
-  columns:
-    handle:    handle
-    continent: handle
-    name:      text
-    topleft:   latlong
-    botright:  latlong
-    flag:      url
-    people:    amount
-  unique: handle
-
-country-pivot:
-  columns:
-    holiday: handle
-    country: handle
-    owner:   handle
-    stars:   rating
+    handle:     handle
+    holiday:    handle
+    checkin:    datetime-utc
+    checkout:   datetime-utc
+    type:       enum(overnight)
+  index: handle
   trigger:
-    deleted: owners--owner
+    deleted: holidays--holiday
+    delete:  locations--parent
 
-informations:
+travels:
   columns:
-    country: handle
-    handle:  handle
-    type:    enum(infotype)
-    info:    text
-  unique: handle
+    handle:     handle
+    checkin:    datetime-utc
+    checkout:   datetime-utc
+    type:       enum(travel)
+  index: handle
+  trigger:
+    deleted: holidays--holiday
+    delete:  locations--parent
 
+locations:
+  columns:
+    handle:     handle
+    parent:     handle
+    belongs-to: enum(polymorph)
+    latlon:     latlong
+    name:       text
+    address:    text
+    city:       text
+    country:    handle
+    phone:      text
+    website:    url
+  index: handle
 
