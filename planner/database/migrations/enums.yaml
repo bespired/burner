@@ -1,0 +1,20 @@
+enums:
+  hashtype:
+    - password
+    - resetcode
+
+  timeframe:
+    - research
+    - plan
+    - travel
+    - done
+
+  owner:
+    - admin
+    - traveler
+
+  infotype:
+    - religion
+    - islands
+    - landmass
+    - weather

@@ -10,11 +10,29 @@ trait MigrateFileRead
         }
 
         $yaml   = file_get_contents($filename);
-        $parsed = (object) @yaml_parse($yaml);
+        $mfiles = (object) @yaml_parse($yaml);
 
-        if (property_exists($parsed, 'scalar')) {
+        if (property_exists($mfiles, 'scalar')) {
             exit("Parsing of $filename failed.\n");
         }
+
+        if (!property_exists($mfiles, 'migrations')) {
+            exit("$filename failed, it should have migrations.\n");
+        }
+        if (!isset($mfiles->migrations['files'])) {
+            exit("$filename failed, it should have migration files.\n");
+        }
+
+        $combined = '';
+        foreach ($mfiles->migrations['files'] as $filename) {
+            $path = __DIR__ . '/../../migrations/' . $filename;
+            if (!file_exists($path)) {
+                exit("Migrate failed: cannot find $path  \n");
+            }
+            $combined .= file_get_contents($path) . "\n";
+        }
+
+        $parsed = (object) @yaml_parse($combined);
 
         if (!property_exists($parsed, 'tables')) {
             exit("$filename failed, it should have tables.\n");

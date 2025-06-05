@@ -1,0 +1,12 @@
+mysql:
+  types:
+    handle:       varchar(24) not null
+    name:         varchar(24)
+    text:         text not null
+    datetime-utc: datetime
+    boolean:      bool
+    rating:       tinyint
+    amount:       bigint
+    latlong:      json
+    enum:         enum
+    url:          text
