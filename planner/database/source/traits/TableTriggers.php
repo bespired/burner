@@ -20,6 +20,8 @@ trait TableTriggers
         }
 
         if (! count($deletes)) {
+            // todo...
+            // if DB has delete triggers... remove them...
             return;
         }
 
@@ -27,6 +29,7 @@ trait TableTriggers
         foreach ($deletes as $table => $delete) {
             list($foreign, $column)    = explode('--', $delete);
             $tiggers[$foreign][$table] = $column;
+
         }
 
         $database = $this->env->mysqlDatabase;
@@ -69,8 +72,12 @@ trait TableTriggers
         return "DROP TRIGGER IF EXISTS delete_{$tableName}_relations";
     }
 
-    public function deleteRelations($tableName, $main, $tableIds)
+    public function deleteRelations($tableName, $handles, $tableIds)
     {
+
+        if (gettype($handles) === 'string') {
+            $handles = [$handles];
+        }
 
         $q = [];
 
@@ -79,7 +86,11 @@ trait TableTriggers
         $q[] = "FOR EACH ROW";
         $q[] = "BEGIN";
         foreach ($tableIds as $table => $id) {
-            $q[] = "DELETE FROM `$table` WHERE `$id` = `OLD`.`$main`;";
+            $column = str_replace('-', '_', $id);
+            foreach ($handles as $handle) {
+                $old = str_replace('-', '_', $handle);
+                $q[] = "DELETE FROM `$table` WHERE `$column` = `OLD`.`$old`;";
+            }
         }
         $q[] = "END";
 
